@@ -25,8 +25,8 @@
 //
 //========================================================================
 
-#ifndef _glx_context_h_
-#define _glx_context_h_
+#ifndef _glfw3_glx_context_h_
+#define _glfw3_glx_context_h_
 
 #define GLX_GLXEXT_LEGACY
 #include <GL/glx.h>
@@ -34,28 +34,8 @@
 // This path may need to be changed if you build GLFW using your own setup
 // We ship and use our own copy of glxext.h since GLFW uses fairly new
 // extensions and not all operating systems come with an up-to-date version
+#define GLX_GLXEXT_PROTOTYPES
 #include "../deps/GL/glxext.h"
-
-// Do we have support for dlopen/dlsym?
-#if defined(_GLFW_HAS_DLOPEN)
- #include <dlfcn.h>
-#endif
-
-// We support four different ways for getting addresses for GL/GLX
-// extension functions: glXGetProcAddress, glXGetProcAddressARB,
-// glXGetProcAddressEXT, and dlsym
-#if defined(_GLFW_HAS_GLXGETPROCADDRESSARB)
- #define _glfw_glXGetProcAddress(x) glXGetProcAddressARB(x)
-#elif defined(_GLFW_HAS_GLXGETPROCADDRESS)
- #define _glfw_glXGetProcAddress(x) glXGetProcAddress(x)
-#elif defined(_GLFW_HAS_GLXGETPROCADDRESSEXT)
- #define _glfw_glXGetProcAddress(x) glXGetProcAddressEXT(x)
-#elif defined(_GLFW_HAS_DLOPEN)
- #define _glfw_glXGetProcAddress(x) dlsym(_glfw.glx.libGL, x)
- #define _GLFW_DLOPEN_LIBGL
-#else
- #error "No OpenGL entry point retrieval mechanism was enabled"
-#endif
 
 #define _GLFW_PLATFORM_FBCONFIG                 GLXFBConfig     glx
 #define _GLFW_PLATFORM_CONTEXT_STATE            _GLFWcontextGLX glx
@@ -82,11 +62,16 @@ typedef struct _GLFWcontextGLX
 //
 typedef struct _GLFWlibraryGLX
 {
-    int             versionMajor, versionMinor;
+    int             major, minor;
     int             eventBase;
     int             errorBase;
 
+    // dlopen handle for libGL.so.1
+    void*           handle;
+
     // GLX extensions
+    PFNGLXGETPROCADDRESSPROC              GetProcAddress;
+    PFNGLXGETPROCADDRESSPROC              GetProcAddressARB;
     PFNGLXSWAPINTERVALSGIPROC             SwapIntervalSGI;
     PFNGLXSWAPINTERVALEXTPROC             SwapIntervalEXT;
     PFNGLXSWAPINTERVALMESAPROC            SwapIntervalMESA;
@@ -96,16 +81,12 @@ typedef struct _GLFWlibraryGLX
     GLboolean       MESA_swap_control;
     GLboolean       ARB_multisample;
     GLboolean       ARB_framebuffer_sRGB;
+    GLboolean       EXT_framebuffer_sRGB;
     GLboolean       ARB_create_context;
     GLboolean       ARB_create_context_profile;
     GLboolean       ARB_create_context_robustness;
     GLboolean       EXT_create_context_es2_profile;
     GLboolean       ARB_context_flush_control;
-
-#if defined(_GLFW_DLOPEN_LIBGL)
-    // dlopen handle for libGL.so (for glfwGetProcAddress)
-    void*           libGL;
-#endif
 
 } _GLFWlibraryGLX;
 
@@ -117,4 +98,4 @@ int _glfwCreateContext(_GLFWwindow* window,
                        const _GLFWfbconfig* fbconfig);
 void _glfwDestroyContext(_GLFWwindow* window);
 
-#endif // _glx_context_h_
+#endif // _glfw3_glx_context_h_

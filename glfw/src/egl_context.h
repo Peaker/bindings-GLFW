@@ -25,8 +25,8 @@
 //
 //========================================================================
 
-#ifndef _egl_context_h_
-#define _egl_context_h_
+#ifndef _glfw3_egl_context_h_
+#define _glfw3_egl_context_h_
 
 #include <EGL/egl.h>
 
@@ -34,11 +34,6 @@
 // We ship and use our own copy of eglext.h since GLFW uses fairly new
 // extensions and not all operating systems come with an up-to-date version
 #include "../deps/EGL/eglext.h"
-
-// Do we have support for dlopen/dlsym?
-#if defined(_GLFW_HAS_DLOPEN)
- #include <dlfcn.h>
-#endif
 
 #define _GLFW_PLATFORM_FBCONFIG                 EGLConfig       egl
 #define _GLFW_PLATFORM_CONTEXT_STATE            _GLFWcontextEGL egl
@@ -65,7 +60,7 @@ typedef struct _GLFWcontextEGL
 typedef struct _GLFWlibraryEGL
 {
     EGLDisplay      display;
-    EGLint          versionMajor, versionMinor;
+    EGLint          major, minor;
 
     GLboolean       KHR_create_context;
 
@@ -82,4 +77,4 @@ int _glfwAnalyzeContext(const _GLFWwindow* window,
                         const _GLFWctxconfig* ctxconfig,
                         const _GLFWfbconfig* fbconfig);
 
-#endif // _egl_context_h_
+#endif // _glfw3_egl_context_h_

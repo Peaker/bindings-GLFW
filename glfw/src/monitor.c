@@ -28,14 +28,11 @@
 #include "internal.h"
 
 #include <math.h>
+#include <float.h>
 #include <string.h>
 #include <stdlib.h>
 #include <limits.h>
 
-#if defined(_MSC_VER) || _WIN64
-#include <malloc.h>
-#define strdup _strdup
-#endif
 
 // Lexical comparison function for GLFW video modes, used by qsort
 //
@@ -308,6 +305,10 @@ GLFWAPI GLFWmonitor** glfwGetMonitors(int* count)
 GLFWAPI GLFWmonitor* glfwGetPrimaryMonitor(void)
 {
     _GLFW_REQUIRE_INIT_OR_RETURN(NULL);
+
+    if (!_glfw.monitorCount)
+        return NULL;
+
     return (GLFWmonitor*) _glfw.monitors[0];
 }
 
@@ -389,10 +390,9 @@ GLFWAPI void glfwSetGamma(GLFWmonitor* handle, float gamma)
 
     _GLFW_REQUIRE_INIT();
 
-    if (gamma <= 0.f)
+    if (gamma != gamma || gamma <= 0.f || gamma > FLT_MAX)
     {
-        _glfwInputError(GLFW_INVALID_VALUE,
-                        "Gamma value must be greater than zero");
+        _glfwInputError(GLFW_INVALID_VALUE, "Invalid gamma value");
         return;
     }
 
