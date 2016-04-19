@@ -118,7 +118,7 @@ library
     glfw/src/monitor.c
     glfw/src/window.c
 
-  cc-options: -D_GLFW_USE_CONFIG_H
+  cc-options: -g -D_GLFW_USE_CONFIG_H
 
   if os(linux) || os(freebsd)
     include-dirs:
